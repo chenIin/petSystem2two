@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        
+	<!--配置注解扫描的包,启动注解-->
+	 <context:component-scan base-package="controller"/>
+	 <mvc:annotation-driven/> <!--开启自动扫描注解-->
+   
+  <!-- 视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+		<!--逻辑前缀-->
+		<property name="prefix" value="/"/>
+		<!--逻辑后缀-->
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+	<!--配置静态资源-->
+	<!--这个比较麻烦,你要一一指定-->
+	 <!--<mvc:resources location="/statics/" mapping="/statics/**"></mvc:resources>-->
+	<!--或  是默认的servlet处理者,就不会把静态的单做是后台请求了,效果同上,注意要配合 <mvc:annotation-driven/>,推荐-->
+	<mvc:default-servlet-handler/>
+
+
+	<!-- 全局设置异常处理 -->
+	<!-- <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	<property name="exceptionMappings">
+	<props>
+	多个不同异常的判断
+	<prop key="java.lang.Exception>转条的页面</prop>
+	</props>
+	</property>
+	</bean> -->
+
+
+	<!--文件上传的配置-->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	<property name="maxUploadSize" value="5000000"/>
+	<property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+
+	<!--拦截器的配置-->
+
+
+
+
+
+	
+</beans>

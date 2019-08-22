@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+       default-autowire="byName">
+     <!--开启注解-->
+    <context:component-scan base-package="service,service.impl,mapper"/>
+
+    <!--开启aop的注解,就是启用@JspectJ注解的支持,spring将自动为匹配的bean创建代理.
+     然后就可以@Aspect申明切面类,使用不同的增强注解于方法上如一个前置增强
+     @Before("execution(* service.*.*(..))")   -->
+    <!--<aop:aspectj-autoproxy expose-proxy="true"/> -->
+
+    <!--加载配置外部数据源database.properties-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:database.properties</value>
+        </property>
+    </bean>
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+    <!--配置sqlsessionFactoryBean（数据源，mapper路径，别名）,这个是mybatis和spring整合的关键步骤  -->
+    <bean id="sqlsessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 加载mybatis全局配置文件 -->
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:mapper/*.xml</value>
+            </list>
+        </property>
+        <property name="typeAliasesPackage" value="entity"/>
+    </bean>
+    <!-- 配置mapper扫描器 持久层接口-->
+    <!--没有必要在 Spring 的 XML 配置文件中注册所有的映射器。相反,你可以使用一个 MapperScannerConfigurer ,-->
+    <!--它 将 会 查 找 类 路 径 下 的 映 射 器 并 自 动 将 它 们 创 建 成 MapperFactoryBean。-->
+    <!--basePackage 属性是让你为映射器接口文件设置基本的包路径。 你可以使用分号或逗号-->
+    <!--作为分隔符设置多于一个的包路径。每个映射器将会在指定的包路径中递归地被搜索到。-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="mapper"/>
+        <!--<property name="sqlSessionFactoryBeanName" value="sqlsessionFactory"/>-->
+    </bean>
+
+    <!--定义事务管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--申明配置事务,这是注解方式,直接在你要事务的方法
+    使用@Transactional(propagation=Propagation.SUPPORTS)
+    或  @Transactional(rollbackFor = {Exception.class})使用. 有多个属性
+    遇到异常时必须回滚-->
+    <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
+
+
+    <!--bean的作用域,默认是singleton单例模式,即改容器中的bean的实例只有一个,
+    当然我们也可以用scope属性修改scope="prototype"是每次double创建新的实例等-->
+    <!--spring配置文件的拆分,有多个applicationContext.xml文件
+    1. ApplicationContext ac=new ClassPathXmlApplicationContext("applicationContext*.xml");匹配所有
+    2.<import resource="applicationContext.xml"/>
+    -->
+
+
+
+
+
+
+</beans>

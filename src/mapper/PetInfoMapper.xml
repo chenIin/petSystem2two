@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.PetInfoMapper">
+
+    <resultMap id="petinfo" type="entity.PetInfo">
+        <id property="id" column="id"/>
+        <result property="pName" column="pName"/>
+        <result property="tid" column="tid"/>
+        <result property="year" column="year"/>
+        <association property="petType" resultMap="petType"/>
+    </resultMap>
+
+    <resultMap id="petType" type="entity.PetType">
+        <id property="tid" column="tid"/>
+        <result property="typeName" column="typeName"/>
+    </resultMap>
+
+    <insert id="addPetInfo">
+
+
+      insert into petinfo values(default,#{pName},#{tid},#{year})
+
+
+    </insert>
+
+
+
+    <delete id="delById">
+
+        delete from petinfo where id=#{id}
+
+    </delete>
+
+
+    <select id="findAll" resultMap="petinfo">
+
+        select * from petinfo p inner join pettype t on (p.tid=t.tid)
+
+    </select>
+
+    <select id="findByTidMo" resultMap="petinfo">
+
+         select * from petinfo p inner join pettype t on (p.tid=t.tid)
+         where  p.tid=#{tid}
+
+    </select>
+
+
+</mapper>
